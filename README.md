@@ -1,6 +1,8 @@
-# Getting Started with Create React App
+# Foundry Cast Command Generator
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+![Alt text](./public/UI_screenshot.png)
 
 ## Available Scripts
 

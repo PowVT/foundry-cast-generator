@@ -83,7 +83,12 @@ const FoundryCastCommandGenerator = () => {
       <div className="w-1/2 p-4 overflow-y-auto">
         <Card>
           <CardHeader>
-            <CardTitle>Foundry Cast Command Generator</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
+              <img src="/logo.png" alt="Foundry Cast Logo" width={40} height={40} className="rounded-full" />
+              <CardTitle className="text-xl font-bold">Foundry Cast Command Generator</CardTitle>
+            </div>
+          </CardTitle>
           </CardHeader>
           <CardContent>
             <form className="space-y-4">
