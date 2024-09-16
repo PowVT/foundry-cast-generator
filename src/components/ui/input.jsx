@@ -5,5 +5,5 @@ export const Input = React.forwardRef((props, ref) => (
 ));
 
 export const Textarea = React.forwardRef((props, ref) => (
-  <textarea ref={ref} {...props} className="border rounded px-2 py-1 w-full" />
+  <textarea ref={ref} {...props} className="border rounded px-2 py-1 w-full base" />
 ));

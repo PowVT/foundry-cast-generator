@@ -4,7 +4,7 @@ import { Input, Textarea } from './ui/input';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Label } from './ui/label';
-import { Checkbox } from './ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 const FoundryCastCommandGenerator = () => {
   const [formData, setFormData] = useState({
     rpcUrl: '',
@@ -17,13 +17,16 @@ const FoundryCastCommandGenerator = () => {
     chainId: '',
     // Add more fields for other Foundry flags
   });
+
+  const [castMethod, setCastMethod] = useState('');
   
   const [command, setCommand] = useState('');
   const [snapshots, setSnapshots] = useState([]);
+  const [snapshotName, setSnapshotName] = useState('');
   
   useEffect(() => {
     generateCommand();
-  }, [formData]);
+  }, [formData, castMethod]);
   
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -34,7 +37,7 @@ const FoundryCastCommandGenerator = () => {
   };
   
   const generateCommand = () => {
-    let cmd = 'cast send';
+    let cmd = `cast ${castMethod}`;
     if (formData.rpcUrl) cmd += ` --rpc-url ${formData.rpcUrl}`;
     if (formData.privateKey) cmd += ` --private-key ${formData.privateKey}`;
     if (formData.gasLimit) cmd += ` --gas-limit ${formData.gasLimit}`;
@@ -48,7 +51,12 @@ const FoundryCastCommandGenerator = () => {
   };
   
   const saveSnapshot = () => {
-    setSnapshots(prevSnapshots => [...prevSnapshots, { command, formData }]);
+    if (snapshotName.trim() === '') {
+      alert('Please enter a name for your snapshot');
+      return;
+    }
+    setSnapshots(prevSnapshots => [...prevSnapshots, { name: snapshotName, command, formData }]);
+    setSnapshotName('');
   };
   
   const loadSnapshot = (index) => {
@@ -64,6 +72,11 @@ const FoundryCastCommandGenerator = () => {
   const copyCommand = () => {
     navigator.clipboard.writeText(command);
   };
+
+  const handleCastMethodChange = (value) => {
+    setCastMethod(value);
+    generateCommand();
+  };
   
   return (
     <div className="flex h-screen">
@@ -74,6 +87,18 @@ const FoundryCastCommandGenerator = () => {
           </CardHeader>
           <CardContent>
             <form className="space-y-4">
+            <div>
+                <Label htmlFor="castMethod">Cast Method</Label>
+                <Select value={castMethod} onValueChange={handleCastMethodChange}>
+                  <SelectTrigger className="w-full bg-white border-gray-300">
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border border-gray-300">
+                    <SelectItem value="send">Send</SelectItem>
+                    <SelectItem value="call">Call</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <div>
                 <Label htmlFor="rpcUrl">RPC URL</Label>
                 <Input
@@ -81,7 +106,7 @@ const FoundryCastCommandGenerator = () => {
                   name="rpcUrl"
                   value={formData.rpcUrl}
                   onChange={handleInputChange}
-                  placeholder="https://mainnet.infura.io/v3/YOUR-PROJECT-ID"
+                  placeholder="https://eth-mainnet.g.alchemy.com/v2/YOUR-API-KEY"
                 />
               </div>
               <div>
@@ -166,7 +191,7 @@ const FoundryCastCommandGenerator = () => {
             <CardTitle>Generated Command</CardTitle>
           </CardHeader>
           <CardContent>
-            <Textarea value={command} readOnly className="h-32" />
+            <Textarea value={command} readOnly className="h-32"/>
             <Button onClick={copyCommand} className="mt-2">
               <Copy className="mr-2 h-4 w-4" /> Copy Command
             </Button>
@@ -174,17 +199,24 @@ const FoundryCastCommandGenerator = () => {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Snapshots</CardTitle>
+            <CardTitle>Saved Commands</CardTitle>
           </CardHeader>
           <CardContent>
-            <Button onClick={saveSnapshot} className="mb-2">
-              <Save className="mr-2 h-4 w-4" /> Save Current Snapshot
-            </Button>
+            <div className="flex space-x-2 mb-2">
+              <Input
+                value={snapshotName}
+                onChange={(e) => setSnapshotName(e.target.value)}
+                placeholder="Enter command name"
+              />
+              <Button onClick={saveSnapshot}>
+                <Save className="mr-2 h-4 w-4" /> Save
+              </Button>
+            </div>
             <div className="space-y-2">
               {snapshots.map((snapshot, index) => (
                 <div key={index} className="flex items-center justify-between">
-                  <Button onClick={() => loadSnapshot(index)} variant="outline">
-                    Load Snapshot {index + 1}
+                  <Button onClick={() => loadSnapshot(index)} variant="outline" className="flex-grow mr-2">
+                    {snapshot.name}
                   </Button>
                   <Button onClick={() => deleteSnapshot(index)} variant="ghost">
                     <Trash2 className="h-4 w-4" />
