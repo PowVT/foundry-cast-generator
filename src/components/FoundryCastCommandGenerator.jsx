@@ -182,7 +182,7 @@ const FoundryCastCommandGenerator = () => {
                   name="chainId"
                   value={formData.chainId}
                   onChange={handleInputChange}
-                  placeholder="120893"
+                  placeholder="1"
                 />
               </div>
               {/* Add more input fields for other Foundry flags */}
